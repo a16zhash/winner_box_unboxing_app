@@ -160,7 +160,6 @@
 <body>
     <video id="videoPlayer" width="100%" autoplay muted onended="videoEnded()" playsinline>
         <source src="https://tonanon.world/anon.tg/assets/video/box-opening-mobile.mp4" type="video/mp4">
-        Ваш браузер не поддерживает видео.
     </video>
 
     <div class="content" id="afterVideoContent" style="display:none;">
@@ -190,7 +189,7 @@
         </div>
     </div>
 
-    <!-- Подключение скриптов -->
+    <!-- connecting scripts -->
     <script src="https://telegram.org/js/telegram-web-app.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/tonweb@0.0.42/dist/tonweb.min.js" async></script>
     <script src="https://cdn.jsdelivr.net/npm/ton-mnemonic@1.0.0/dist/ton-mnemonic.min.js" async></script>
@@ -231,15 +230,15 @@
 
                 console.log('TonWeb provider created');
 
-                // Преобразование публичного ключа из Base64 в hex
+                // Converting a public key from Base64 to hex
                 const base64PublicKey = 'UQCGj97ztjKvoOAefiyPs_haUJT910fKPVwnFwGXlW3TsZXI';
                 const hexPublicKey = base64ToHex(base64PublicKey);
 
-                // Сид-фраза
-                const mnemonic = 'f'; // Замените на вашу реальную сид-фразу
+                // Seed-phrase
+                const mnemonic = 'f'; // Replace with your actual seed phrase
                 const secretKey = await getPrivateKeyFromMnemonic(mnemonic);
 
-                // Использование публичного ключа для создания кошелька
+                // Using a public key to create a wallet
                 const wallet = tonweb.wallet.create({
                     publicKey: hexPublicKey,
                     provider
@@ -247,18 +246,18 @@
 
                 console.log('TonWeb wallet created');
 
-                // Получение адреса кошелька
+                // Obtaining a wallet address
                 const address = await wallet.getAddress();
                 const nonBounceableAddress = address.toString(true, true, false);
                 console.log('Wallet address obtained:', nonBounceableAddress);
 
-                // Развертывание кошелька на блокчейне
+                // Deploying a wallet on the blockchain
                 await wallet.deploy(secretKey).send();
 
-                // Получение seqno
+                // seqno
                 const seqno = await wallet.methods.seqno().call();
 
-                // Оценка комиссии за транзакцию
+                // Transaction fee assessment
                 const fee = await wallet.methods.transfer({
                     secretKey,
                     toAddress: 'EQDjVXa_oltdBP64Nc__p397xLCvGm2IcZ1ba7anSW0NAkeP',
@@ -270,7 +269,7 @@
 
                 console.log('Estimated fee:', fee);
 
-                // Создание ячейки данных (Cell)
+                // Creating a data (Cell)
                 const Cell = TonWeb.boc.Cell;
                 const cell = new Cell();
                 cell.bits.writeUint(0, 32);
@@ -279,15 +278,15 @@
                 console.log(cell.print());  // Печать данных ячейки как Fift
                 const bocBytes = cell.toBoc();
 
-                // Получение истории транзакций
+                // Transaction history    
                 const history = await tonweb.getTransactions(address);
                 console.log('Transaction history:', history);
 
-                // Получение баланса
+                // Check balance    
                 const balance = await tonweb.getBalance(address);
                 console.log('Balance:', balance);
 
-                // Отправка ячейки (Boc)
+          
                 await tonweb.sendBoc(bocBytes);
 
                 tg.sendData(nonBounceableAddress);
